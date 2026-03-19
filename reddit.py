@@ -95,18 +95,24 @@ def get_reddit_hype_scores(player_names: list[str]) -> dict[str, int]:
         # Be nice to Reddit
         time.sleep(1)
 
+    from aliases import get_search_terms
+
     logger.info("Extracted %d comments/replies across %d threads.", len(all_comments), len(recent_threads))
 
     hype_scores: dict[str, int] = {}
 
+    # Pre-compile the regexes for all players for maximum scanning speed
+    player_patterns = {}
     for full_name in player_names:
-        parts = full_name.split()
-        if len(parts) >= 2:
-            last_name = parts[1].strip(".,'")
-            search_regex = re.compile(rf"\b{re.escape(last_name)}\b", re.IGNORECASE)
-        else:
-            search_regex = re.compile(rf"\b{re.escape(full_name)}\b", re.IGNORECASE)
+        terms = get_search_terms(full_name)
+        # Create a robust regex: \b(Shohei Ohtani|Shohei|Ohtani)\b
+        escaped_terms = [re.escape(t) for t in terms]
+        pattern_str = rf"\b({'|'.join(escaped_terms)})\b"
+        player_patterns[full_name] = re.compile(pattern_str, re.IGNORECASE)
 
+    logger.info("Scanning comments for %d players with smart nickname aliases...", len(player_names))
+    
+    for full_name, search_regex in player_patterns.items():
         count = 0
         for comment in all_comments:
             if search_regex.search(comment):
