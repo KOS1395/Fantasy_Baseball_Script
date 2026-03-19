@@ -48,6 +48,7 @@ def main() -> None:
     from scraper import scrape_trending_players
     from emailer import send_email
     from espn import get_rostered_players
+    from reddit import get_reddit_hype_scores
 
     rostered_players = get_rostered_players()
     if rostered_players:
@@ -66,6 +67,12 @@ def main() -> None:
         return
 
     logger.info("Scraped %d trending players.", len(players))
+    
+    # Get Reddit hype scores
+    player_names = [p["name"] for p in players]
+    hype_scores = get_reddit_hype_scores(player_names)
+    for p in players:
+        p["hype_score"] = hype_scores.get(p["name"], 0)
     for p in players:
         arrow = "↑" if p["trend_dir"] == "up" else ("↓" if p["trend_dir"] == "down" else "—")
         logger.info("  %s  %s %s  |  %s", p["name"], arrow, p["trend_pct"], p["stat_label"])

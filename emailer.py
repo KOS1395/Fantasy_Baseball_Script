@@ -169,6 +169,19 @@ _EMAIL_TEMPLATE = """
     font-size: 14px;
     font-weight: 700;
     font-family: monospace;
+    margin-bottom: 4px;
+  }
+  .hype-badge {
+    display: inline-block;
+    background: rgba(255, 69, 0, 0.15); /* Reddit orangeish */
+    color: #ff4500;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-left: 6px;
   }
   .trend-up {
     background: rgba(34, 197, 94, 0.15);
@@ -270,15 +283,21 @@ _EMAIL_TEMPLATE = """
           </div>
           <div class="card-trend">
             {% if player.trend_dir == 'up' %}
-            <span class="trend-badge trend-up">
+            <div class="trend-badge trend-up">
               <span class="trend-arrow">↑</span>{{ player.trend_pct }}
-            </span>
+            </div>
             {% elif player.trend_dir == 'down' %}
-            <span class="trend-badge trend-down">
+            <div class="trend-badge trend-down">
               <span class="trend-arrow">↓</span>{{ player.trend_pct }}
-            </span>
+            </div>
             {% else %}
-            <span class="trend-badge trend-unknown">—</span>
+            <div class="trend-badge trend-unknown">—</div>
+            {% endif %}
+
+            {% if player.hype_score > 0 %}
+            <div class="hype-badge">
+              💬 {{ player.hype_score }}
+            </div>
             {% endif %}
           </div>
         </div>
@@ -355,7 +374,8 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     plain_lines = [f"MLB Trending Players — {now.strftime('%B ')}{now.day}, {now.year}", ""]
     for i, p in enumerate(players, 1):
         arrow = "↑" if p["trend_dir"] == "up" else ("↓" if p["trend_dir"] == "down" else "—")
-        plain_lines.append(f"#{i}  {p['name']}  {arrow} {p['trend_pct']}  |  {p['stat_label']}")
+        hype = f" [Reddit Hype: {p['hype_score']}]" if p.get("hype_score", 0) > 0 else ""
+        plain_lines.append(f"#{i}  {p['name']}  {arrow} {p['trend_pct']}  |  {p['stat_label']}{hype}")
         plain_lines.append(f"    {p['profile_url']}")
     plain_lines += ["", "View full dashboard: https://baseballsavant.mlb.com/"]
     plain_body = "\n".join(plain_lines)
