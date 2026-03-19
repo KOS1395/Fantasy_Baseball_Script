@@ -33,62 +33,76 @@ def _extract_all_comments(data: Any, comments_list: list[str]) -> None:
             _extract_all_comments(item, comments_list)
 
 
+import time
+
 def get_reddit_hype_scores(player_names: list[str]) -> dict[str, int]:
     """
-    Fetch the stickied thread from r/fantasybaseball.
+    Find recent 'Anything Goes' threads (past 4 days).
     Extract all comments.
     Count how many comments mention each player's last name.
-    
-    Returns:
-        dict: Mapping of player full name to number of mentions (Hype Score).
     """
     if not player_names:
         return {}
 
-    logger.info("Fetching r/fantasybaseball daily stickied thread…")
+    logger.info("Fetching r/fantasybaseball recent Anything Goes threads (past 96h)…")
 
-    headers = {
-        "User-Agent": "MLB-Trending-Emailer/1.0"
-    }
-    url = "https://www.reddit.com/r/fantasybaseball/about/sticky.json"
+    headers = {"User-Agent": "MLB-Trending-Emailer/1.0"}
+    search_url = "https://www.reddit.com/r/fantasybaseball/search.json?q=Anything+Goes&restrict_sr=on&sort=new&t=week"
 
     try:
-        resp = requests.get(url, headers=headers, timeout=10)
+        resp = requests.get(search_url, headers=headers, timeout=10)
         resp.raise_for_status()
-        thread_data = resp.json()
+        search_data = resp.json()
     except Exception as exc:  # noqa: BLE001
-        logger.error("Failed to fetch Reddit thread: %s", exc)
+        logger.error("Failed to fetch Reddit search results: %s", exc)
         return {name: 0 for name in player_names}
 
-    if not thread_data or len(thread_data) < 2:
-        logger.error("Unexpected Reddit JSON structure.")
+    posts = search_data.get("data", {}).get("children", [])
+    if not posts:
+        logger.warning("No Anything Goes threads found in the past week.")
         return {name: 0 for name in player_names}
 
-    # Extract title just for logging
-    try:
-        title = thread_data[0]["data"]["children"][0]["data"]["title"]
-        logger.info("Scanning thread: %s", title)
-    except (KeyError, IndexError):
-        logger.info("Scanning stickied thread...")
+    # Filter threads created within the last 96 hours
+    current_time = time.time()
+    recent_threads = []
+    max_age_seconds = 4 * 24 * 3600
 
-    # Extract all comment bodies
+    for p in posts:
+        post_data = p.get("data", {})
+        created_utc = post_data.get("created_utc", 0)
+        if current_time - created_utc <= max_age_seconds:
+            recent_threads.append(post_data)
+
+    logger.info("Found %d threads matching criteria. Fetching comments…", len(recent_threads))
+
     all_comments: list[str] = []
-    _extract_all_comments(thread_data[1], all_comments)
-    logger.info("Extracted %d comments/replies.", len(all_comments))
+
+    for thread in recent_threads:
+        permalink = thread.get("permalink", "")
+        if not permalink:
+            continue
+        
+        thread_url = f"https://www.reddit.com{permalink}.json"
+        try:
+            r = requests.get(thread_url, headers=headers, timeout=10)
+            if r.status_code == 200:
+                thread_data = r.json()
+                if len(thread_data) >= 2:
+                    _extract_all_comments(thread_data[1], all_comments)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Failed to fetch comments for thread %s: %s", permalink, exc)
+        
+        # Be nice to Reddit
+        time.sleep(1)
+
+    logger.info("Extracted %d comments/replies across %d threads.", len(all_comments), len(recent_threads))
 
     hype_scores: dict[str, int] = {}
 
     for full_name in player_names:
-        # Split into parts. Usually ["Shohei", "Ohtani"]
         parts = full_name.split()
         if len(parts) >= 2:
-            # Match by last name.
-            # E.g., if parts are ["Ronald", "Acuña", "Jr."], last name is "Acuña"
             last_name = parts[1].strip(".,'")
-            
-            # For common short names like "Pena" or "Smith", searching just the last name
-            # might yield false positives, but since we are only searching for players
-            # ALREADY trending on Baseball Savant, the risk is much lower.
             search_regex = re.compile(rf"\b{re.escape(last_name)}\b", re.IGNORECASE)
         else:
             search_regex = re.compile(rf"\b{re.escape(full_name)}\b", re.IGNORECASE)

@@ -21,7 +21,7 @@ _EMAIL_TEMPLATE = """
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>⚾ MLB Trending Players</title>
+<title>💬 Reddit Fantasy Baseball Hype</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
 
@@ -252,15 +252,15 @@ _EMAIL_TEMPLATE = """
 
   <!-- Header -->
   <div class="header">
-    <div class="header-badge">⚾ Baseball Savant</div>
-    <h1>Trending Players</h1>
-    <p class="subtitle">This week's hottest names on Statcast</p>
+    <div class="header-badge">r/fantasybaseball</div>
+    <h1>Waiver Wire Hype</h1>
+    <p class="subtitle">Top available players mentioned on Reddit in the last 4 days</p>
     <div class="date-line">{{ date_str }}</div>
   </div>
 
   <!-- Body -->
   <div class="body">
-    <p class="section-title">🔥 Top Trending — {{ players|length }} Players</p>
+    <p class="section-title">🔥 Top Hyped Available Players — {{ players|length }} names</p>
 
     {% if players %}
       {% for player in players %}
@@ -282,22 +282,21 @@ _EMAIL_TEMPLATE = """
             <p class="stat-label">{{ player.stat_label }}</p>
           </div>
           <div class="card-trend">
-            {% if player.trend_dir == 'up' %}
-            <div class="trend-badge trend-up">
-              <span class="trend-arrow">↑</span>{{ player.trend_pct }}
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 {{ player.hype_score }} Mentions
             </div>
-            {% elif player.trend_dir == 'down' %}
-            <div class="trend-badge trend-down">
-              <span class="trend-arrow">↓</span>{{ player.trend_pct }}
-            </div>
-            {% else %}
-            <div class="trend-badge trend-unknown">—</div>
-            {% endif %}
-
-            {% if player.hype_score > 0 %}
-            <div class="hype-badge">
-              💬 {{ player.hype_score }}
-            </div>
+            
+            {% if player.trend_dir %}
+              <br/>
+              {% if player.trend_dir == 'up' %}
+              <div class="trend-badge trend-up">
+                <span class="trend-arrow">↑</span>{{ player.trend_pct }}
+              </div>
+              {% elif player.trend_dir == 'down' %}
+              <div class="trend-badge trend-down">
+                <span class="trend-arrow">↓</span>{{ player.trend_pct }}
+              </div>
+              {% endif %}
             {% endif %}
           </div>
         </div>
@@ -321,7 +320,7 @@ _EMAIL_TEMPLATE = """
 
   <!-- Footer -->
   <div class="footer">
-    <p>Data sourced from <a href="https://baseballsavant.mlb.com">Baseball Savant / MLB Statcast</a></p>
+    <p>Data sourced from <a href="https://reddit.com/r/fantasybaseball">Reddit</a> and <a href="https://baseballsavant.mlb.com">Baseball Savant</a></p>
     <p>Sent automatically on Wednesday &amp; Sunday at 7:00 PM</p>
     <p style="margin-top:8px; color:#1e2d4d;">
       To stop receiving these emails, simply disable the scheduler.
@@ -348,7 +347,7 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     """Build and send (or print) the trending players email."""
     html_body = build_html(players)
     now = datetime.now()
-    subject = f"⚾ MLB Trending Players — {now.strftime('%B ')} {now.day}, {now.strftime('%Y')}"
+    subject = f"⚾ Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.strftime('%Y')}"
 
     if dry_run:
         print("\n" + "=" * 60)
@@ -371,11 +370,11 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     msg["To"] = ", ".join(config.EMAIL_TO)
 
     # Plain-text fallback
-    plain_lines = [f"MLB Trending Players — {now.strftime('%B ')}{now.day}, {now.year}", ""]
+    plain_lines = [f"Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.year}", ""]
     for i, p in enumerate(players, 1):
-        arrow = "↑" if p["trend_dir"] == "up" else ("↓" if p["trend_dir"] == "down" else "—")
-        hype = f" [Reddit Hype: {p['hype_score']}]" if p.get("hype_score", 0) > 0 else ""
-        plain_lines.append(f"#{i}  {p['name']}  {arrow} {p['trend_pct']}  |  {p['stat_label']}{hype}")
+        arrow = f"({p['trend_dir']} {p['trend_pct']})" if p.get("trend_dir") else ""
+        hype = f"[💬 {p['hype_score']} Mentions]"
+        plain_lines.append(f"#{i}  {p['name']}  {hype} {arrow} |  {p['stat_label']}")
         plain_lines.append(f"    {p['profile_url']}")
     plain_lines += ["", "View full dashboard: https://baseballsavant.mlb.com/"]
     plain_body = "\n".join(plain_lines)

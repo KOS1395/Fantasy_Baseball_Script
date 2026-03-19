@@ -24,7 +24,7 @@ logger = logging.getLogger("main")
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="MLB Baseball Savant Trending Players — Email Digest"
+        description="MLB Reddit Hype + Baseball Savant — Email Digest"
     )
     parser.add_argument(
         "--dry-run",
@@ -45,39 +45,77 @@ def main() -> None:
         return
 
     # One-shot mode (with or without --dry-run)
+    from mlb_stats import get_active_mlb_players
+    from espn import get_rostered_players, normalize_name
+    from reddit import get_reddit_hype_scores
     from scraper import scrape_trending_players
     from emailer import send_email
-    from espn import get_rostered_players
-    from reddit import get_reddit_hype_scores
 
-    rostered_players = get_rostered_players()
-    if rostered_players:
-        logger.info("Will filter out %d players currently rostered in ESPN.", len(rostered_players))
+    # 1. Fetch MLB Universe
+    all_players = get_active_mlb_players()
+    if not all_players:
+        logger.error("Failed to load MLB player universe. Exiting.")
+        return
 
-    logger.info("Scraping trending players from Baseball Savant…")
-    players = scrape_trending_players(owned_players=rostered_players)
+    # 2. Fetch ESPN Rosters
+    rostered_names = get_rostered_players()
+    if rostered_names:
+        logger.info("Will filter out %d players currently rostered in ESPN.", len(rostered_names))
 
-    if not players:
-        logger.warning(
-            "No trending players were found. "
-            "The site may be loading slowly or the off-season is active."
-        )
+    # 3. Filter available players
+    available_players = []
+    for p in all_players:
+        if normalize_name(p["name"]) not in rostered_names:
+            available_players.append(p)
+    logger.info("%d players available on waiver wire.", len(available_players))
+
+    # 4. Fetch Reddit Hype Scores (4-day window)
+    available_names = [p["name"] for p in available_players]
+    hype_scores = get_reddit_hype_scores(available_names)
+
+    # 5. Filter to players with hype and sort
+    hyped_players = []
+    for p in available_players:
+        score = hype_scores.get(p["name"], 0)
+        if score > 0:
+            p["hype_score"] = score
+            hyped_players.append(p)
+
+    hyped_players.sort(key=lambda x: x["hype_score"], reverse=True)
+    top_15 = hyped_players[:15]
+
+    if not top_15:
+        logger.warning("No available players are being hyped on Reddit right now.")
         if args.dry_run:
             send_email([], dry_run=True)
         return
 
-    logger.info("Scraped %d trending players.", len(players))
-    
-    # Get Reddit hype scores
-    player_names = [p["name"] for p in players]
-    hype_scores = get_reddit_hype_scores(player_names)
-    for p in players:
-        p["hype_score"] = hype_scores.get(p["name"], 0)
-    for p in players:
-        arrow = "↑" if p["trend_dir"] == "up" else ("↓" if p["trend_dir"] == "down" else "—")
-        logger.info("  %s  %s %s  |  %s", p["name"], arrow, p["trend_pct"], p["stat_label"])
+    # 6. Fetch Baseball Savant Context
+    logger.info("Fetching Baseball Savant list to append trend contexts…")
+    savant_players = scrape_trending_players(owned_players=set())
+    savant_map = {normalize_name(p["name"]): p for p in savant_players}
 
-    send_email(players, dry_run=args.dry_run)
+    # 7. Merge Context
+    for p in top_15:
+        p["profile_url"] = f"https://baseballsavant.mlb.com/savant-player/{p['player_id']}"
+        norm_name = normalize_name(p["name"])
+        if norm_name in savant_map:
+            s_data = savant_map[norm_name]
+            p["trend_dir"] = s_data["trend_dir"]
+            p["trend_pct"] = s_data["trend_pct"]
+            p["stat_label"] = s_data["stat_label"]
+        else:
+            p["trend_dir"] = None
+            p["trend_pct"] = ""
+            p["stat_label"] = f"Pos: {p['position']}"
+
+    logger.info("Final Top %d Hyped Players:", len(top_15))
+    for i, p in enumerate(top_15, 1):
+        trend = f"({p['trend_dir']} {p['trend_pct']})" if p['trend_dir'] else ""
+        logger.info("  #%-2d %-25s 💬 %-3s %s", i, p["name"], p["hype_score"], trend)
+
+    # 8. Send Email
+    send_email(top_15, dry_run=args.dry_run)
     if not args.dry_run:
         logger.info("✅ Email sent successfully!")
 
