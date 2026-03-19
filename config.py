@@ -32,3 +32,9 @@ SCHEDULE_MINUTE: int = int(os.getenv("SCHEDULE_MINUTE", "0"))
 
 # Baseball Savant
 SAVANT_URL: str = "https://baseballsavant.mlb.com/"
+
+# ESPN Fantasy Baseball
+ESPN_LEAGUE_ID: str = _get_or_empty("ESPN_LEAGUE_ID")
+ESPN_YEAR: int = int(os.getenv("ESPN_YEAR", "2026"))
+ESPN_S2: str = _get_or_empty("ESPN_S2")
+SWID: str = _get_or_empty("SWID")

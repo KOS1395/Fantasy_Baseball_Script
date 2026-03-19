@@ -45,12 +45,17 @@ def _parse_trend(trend_str: str) -> tuple[str, str]:
     return "unknown", "N/A"
 
 
-def scrape_trending_players(timeout_s: int = 10) -> list[dict[str, Any]]:
+def scrape_trending_players(
+    timeout_s: int = 10, owned_players: set[str] | None = None
+) -> list[dict[str, Any]]:
     """
     Fetch trending players from the Baseball Savant API.
-    Returns a list of player dicts in trending order.
+    Returns a list of player dicts in trending order, filtered by upward trend,
+    and optionally filtering out any players whose normalized names are in `owned_players`.
     """
     logger.info("Fetching trending players from %s", API_URL)
+    if owned_players is None:
+        owned_players = set()
 
     headers = {
         "User-Agent": (
@@ -69,6 +74,9 @@ def scrape_trending_players(timeout_s: int = 10) -> list[dict[str, Any]]:
     except requests.RequestException as exc:
         logger.error("Failed to fetch trending players: %s", exc)
         return []
+        
+    # We import espn.normalize_name here to avoid circular imports if espn imports config/etc.
+    from espn import normalize_name
 
     players: list[dict[str, Any]] = []
     for entry in data:
@@ -78,6 +86,16 @@ def scrape_trending_players(timeout_s: int = 10) -> list[dict[str, Any]]:
         team = entry.get("parent_team", "")
         trend_raw = entry.get("trend", "")
         trend_dir, trend_pct = _parse_trend(trend_raw)
+
+        # Skip players trending down
+        if trend_dir != "up":
+            continue
+
+        # Check ownership
+        norm_name = normalize_name(name)
+        if norm_name in owned_players:
+            logger.debug("Skipping %s — already rostered in ESPN.", name)
+            continue
 
         players.append({
             "name": name or "Unknown Player",
@@ -90,6 +108,6 @@ def scrape_trending_players(timeout_s: int = 10) -> list[dict[str, Any]]:
             "position": pos,
         })
 
-    players = [p for p in players if p["trend_dir"] == "up"]
-    logger.info("Found %d trending players (up only).", len(players))
+    logger.info("Found %d available trending players (up only).", len(players))
     return players
+

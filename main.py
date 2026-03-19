@@ -47,9 +47,14 @@ def main() -> None:
     # One-shot mode (with or without --dry-run)
     from scraper import scrape_trending_players
     from emailer import send_email
+    from espn import get_rostered_players
+
+    rostered_players = get_rostered_players()
+    if rostered_players:
+        logger.info("Will filter out %d players currently rostered in ESPN.", len(rostered_players))
 
     logger.info("Scraping trending players from Baseball Savant…")
-    players = scrape_trending_players()
+    players = scrape_trending_players(owned_players=rostered_players)
 
     if not players:
         logger.warning(
