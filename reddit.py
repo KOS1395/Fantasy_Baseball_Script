@@ -3,7 +3,8 @@ reddit.py — Fetch the daily stickied thread from r/fantasybaseball
 and count mentions of specific players to calculate a 'Hype Score'.
 """
 import logging
-import re
+import regex as re
+import time
 from typing import Any
 
 import requests
@@ -105,9 +106,19 @@ def get_reddit_hype_scores(player_names: list[str]) -> dict[str, int]:
     player_patterns = {}
     for full_name in player_names:
         terms = get_search_terms(full_name)
-        # Create a robust regex: \b(Shohei Ohtani|Shohei|Ohtani)\b
-        escaped_terms = [re.escape(t) for t in terms]
-        pattern_str = rf"\b({'|'.join(escaped_terms)})\b"
+        # Create a robust regex: (?e)\b(?:(?:Shohei Ohtani){e<=1}|(?:Shohei){e<=1}|Ohtani)\b
+        regex_terms = []
+        for t in terms:
+            escaped_t = re.escape(t)
+            # Only allow typos (1 edit distance) if the alias is longer than 5 characters
+            # to prevent matching completely different short words (like CES matching CAT)
+            if len(t) > 5:
+                regex_terms.append(f"(?:{escaped_t}){{e<=1}}")
+            else:
+                regex_terms.append(escaped_t)
+                
+        # (?e) enables fuzzy matching mode in the `regex` library
+        pattern_str = rf"(?e)\b(?:{'|'.join(regex_terms)})\b"
         player_patterns[full_name] = re.compile(pattern_str, re.IGNORECASE)
 
     logger.info("Scanning comments for %d players with smart nickname aliases...", len(player_names))
