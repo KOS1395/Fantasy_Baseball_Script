@@ -1,6 +1,6 @@
 # ⚾ MLB Baseball Savant — Trending Players Email App
 
-Automatically scrapes the **Trending Players** section from [Baseball Savant](https://baseballsavant.mlb.com/) and emails you a styled digest every **Wednesday and Sunday at 7:00 PM**.
+Automatically scrapes the **Trending Players** section from [Baseball Savant](https://baseballsavant.mlb.com/) and emails you a styled digest every **Wednesday and Sunday at 12:00 PM**.
 
 ---
 
