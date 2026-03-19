@@ -347,14 +347,29 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     """Build and send (or print) the trending players email."""
     html_body = build_html(players)
     now = datetime.now()
-    subject = f"⚾ Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.strftime('%Y')}"
+    subject = f"⚾ Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.year}"
+
+    # Plain-text fallback
+    plain_lines = [f"Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.year}", ""]
+    for i, p in enumerate(players, 1):
+        arrow = f"({p['trend_dir']} {p['trend_pct']})" if p.get("trend_dir") else ""
+        hype = f"[💬 {p['hype_score']} Mentions]"
+        plain_lines.append(f"#{i}  {p['name']}  {hype} {arrow} |  {p['stat_label']}")
+        plain_lines.append(f"    {p['profile_url']}")
+    plain_lines += ["", "View full dashboard: https://baseballsavant.mlb.com/"]
+    plain_body = "\n".join(plain_lines)
 
     if dry_run:
         print("\n" + "=" * 60)
         print(f"DRY RUN — Would send: '{subject}'")
         print(f"TO: {', '.join(config.EMAIL_TO) if config.EMAIL_TO else 'Not Configured'}")
         print("=" * 60)
-        print(html_body)
+        
+        preview_path = "preview.html"
+        with open(preview_path, "w", encoding="utf-8") as f:
+            f.write(html_body)
+        print(f"HTML output saved to {preview_path}")    
+        print(plain_body)
         print("=" * 60 + "\n")
         return
 
@@ -368,16 +383,6 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     msg["Subject"] = subject
     msg["From"] = config.EMAIL_FROM
     msg["To"] = ", ".join(config.EMAIL_TO)
-
-    # Plain-text fallback
-    plain_lines = [f"Waiver Wire Hype (Reddit) — {now.strftime('%B ')}{now.day}, {now.year}", ""]
-    for i, p in enumerate(players, 1):
-        arrow = f"({p['trend_dir']} {p['trend_pct']})" if p.get("trend_dir") else ""
-        hype = f"[💬 {p['hype_score']} Mentions]"
-        plain_lines.append(f"#{i}  {p['name']}  {hype} {arrow} |  {p['stat_label']}")
-        plain_lines.append(f"    {p['profile_url']}")
-    plain_lines += ["", "View full dashboard: https://baseballsavant.mlb.com/"]
-    plain_body = "\n".join(plain_lines)
 
     msg.attach(MIMEText(plain_body, "plain"))
     msg.attach(MIMEText(html_body, "html"))

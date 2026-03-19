@@ -10,6 +10,10 @@ import argparse
 import logging
 import sys
 
+# Force UTF-8 encoding for stdout on Windows to support emojis
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -112,7 +116,8 @@ def main() -> None:
     logger.info("Final Top %d Hyped Players:", len(top_15))
     for i, p in enumerate(top_15, 1):
         trend = f"({p['trend_dir']} {p['trend_pct']})" if p['trend_dir'] else ""
-        logger.info("  #%-2d %-25s 💬 %-3s %s", i, p["name"], p["hype_score"], trend)
+        # Removed emoji from the terminal logger to prevent Windows UnicodeEncodeError
+        logger.info("  #%-2d %-25s HYPE: %-3s %s", i, p["name"], p["hype_score"], trend)
 
     # 8. Send Email
     send_email(top_15, dry_run=args.dry_run)

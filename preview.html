@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💬 Reddit Fantasy Baseball Hype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  body {
+    margin: 0; padding: 0;
+    background: #0a0e1a;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #e2e8f0;
+  }
+  .wrapper {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #0a0e1a;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: linear-gradient(135deg, #1a2540 0%, #0f1e3a 50%, #1a1030 100%);
+    padding: 40px 32px 32px;
+    text-align: center;
+    border-bottom: 2px solid #2a3a5e;
+  }
+  .header-badge {
+    display: inline-block;
+    background: linear-gradient(90deg, #c41e3a, #e8503a);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+  }
+  .header .subtitle {
+    color: #7fa4cc;
+    font-size: 14px;
+    margin: 0;
+  }
+  .header .date-line {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #4a6fa5;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ─── Body ─── */
+  .body {
+    padding: 28px 24px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a6fa5;
+    margin: 0 0 16px;
+  }
+
+  /* ─── Player Card ─── */
+  .player-card {
+    background: linear-gradient(135deg, #121a2e 0%, #171f38 100%);
+    border: 1px solid #1e2d4d;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .player-card:hover { border-color: #2a4070; }
+  .card-inner {
+    display: table;
+    width: 100%;
+    padding: 18px 20px;
+    box-sizing: border-box;
+  }
+  .card-rank {
+    display: table-cell;
+    width: 36px;
+    vertical-align: middle;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e4268;
+    white-space: nowrap;
+  }
+  .card-avatar {
+    display: table-cell;
+    width: 54px;
+    vertical-align: middle;
+    padding-right: 14px;
+  }
+  .avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3050, #2a4578);
+    display: block;
+    overflow: hidden;
+  }
+  .avatar-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  .card-info {
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .player-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 3px;
+    text-decoration: none;
+  }
+  .player-name a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+  .player-name a:hover { color: #7fa4cc; }
+  .stat-label {
+    font-size: 12px;
+    color: #5a7aa8;
+    margin: 0;
+    font-weight: 600;
+  }
+  .card-trend {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .trend-badge {
+    display: inline-block;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-bottom: 4px;
+  }
+  .hype-badge {
+    display: inline-block;
+    background: rgba(255, 69, 0, 0.15); /* Reddit orangeish */
+    color: #ff4500;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-left: 6px;
+  }
+  .trend-up {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+  }
+  .trend-down {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+  }
+  .trend-unknown {
+    background: rgba(100, 116, 139, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+  }
+  .trend-arrow {
+    margin-right: 4px;
+  }
+
+  /* ─── Divider ─── */
+  .divider {
+    border: 0;
+    border-top: 1px solid #1a2540;
+    margin: 24px 0;
+  }
+
+  /* ─── Empty state ─── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #4a6fa5;
+    font-size: 14px;
+  }
+
+  /* ─── CTA ─── */
+  .cta-btn {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    background: linear-gradient(90deg, #c41e3a, #e8503a);
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 24px;
+    border-radius: 8px;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Footer ─── */
+  .footer {
+    padding: 24px 32px;
+    text-align: center;
+    border-top: 1px solid #141e32;
+  }
+  .footer p {
+    margin: 4px 0;
+    font-size: 11px;
+    color: #2e4268;
+  }
+  .footer a { color: #3d5a8a; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">r/fantasybaseball</div>
+    <h1>Waiver Wire Hype</h1>
+    <p class="subtitle">Top available players mentioned on Reddit in the last 4 days</p>
+    <div class="date-line">Thursday, March 19, 2026</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+    <p class="section-title">🔥 Top Hyped Available Players — 15 names</p>
+
+    
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#1</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/690925/headshot/67/current"
+                alt="Clayton Beeter"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/690925" target="_blank">Clayton Beeter</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 71 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#2</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/813349/headshot/67/current"
+                alt="Connelly Early"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/813349" target="_blank">Connelly Early</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 47 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#3</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/642397/headshot/67/current"
+                alt="Gregory Soto"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/642397" target="_blank">Gregory Soto</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 42 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#4</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/596142/headshot/67/current"
+                alt="Gary Sánchez"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/596142" target="_blank">Gary Sánchez</a>
+            </div>
+            <p class="stat-label">Pos: C</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 34 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#5</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/660821/headshot/67/current"
+                alt="Jesús Sánchez"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/660821" target="_blank">Jesús Sánchez</a>
+            </div>
+            <p class="stat-label">Pos: RF</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 34 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#6</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/571948/headshot/67/current"
+                alt="Hoby Milner"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/571948" target="_blank">Hoby Milner</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 32 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#7</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/605447/headshot/67/current"
+                alt="Jordan Romano"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/605447" target="_blank">Jordan Romano</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 30 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#8</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/690022/headshot/67/current"
+                alt="Ryan Ritter"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/690022" target="_blank">Ryan Ritter</a>
+            </div>
+            <p class="stat-label">Pos: SS</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 27 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#9</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/605488/headshot/67/current"
+                alt="Jeffrey Springs"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/605488" target="_blank">Jeffrey Springs</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 27 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#10</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/670990/headshot/67/current"
+                alt="Yohan Ramírez"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/670990" target="_blank">Yohan Ramírez</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 26 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#11</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/666969/headshot/67/current"
+                alt="Adolis García"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/666969" target="_blank">Adolis García</a>
+            </div>
+            <p class="stat-label">Pos: RF</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 22 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#12</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/472610/headshot/67/current"
+                alt="Luis García"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/472610" target="_blank">Luis García</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 22 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#13</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/671277/headshot/67/current"
+                alt="Luis García Jr."
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/671277" target="_blank">Luis García Jr.</a>
+            </div>
+            <p class="stat-label">Pos: 2B</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 22 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#14</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/554340/headshot/67/current"
+                alt="Yimi García"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/554340" target="_blank">Yimi García</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 22 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+      <div class="player-card">
+        <div class="card-inner">
+          <div class="card-rank">#15</div>
+          <div class="card-avatar">
+            <div class="avatar-img">
+              <img
+                src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_48,q_auto:best/v1/people/689981/headshot/67/current"
+                alt="River Ryan"
+              />
+            </div>
+          </div>
+          <div class="card-info">
+            <div class="player-name">
+              <a href="https://baseballsavant.mlb.com/savant-player/689981" target="_blank">River Ryan</a>
+            </div>
+            <p class="stat-label">Pos: P</p>
+          </div>
+          <div class="card-trend">
+            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+              💬 22 Mentions
+            </div>
+            
+            
+          </div>
+        </div>
+      </div>
+      
+    
+
+    <hr class="divider" />
+
+    <div style="text-align:center; margin-bottom:28px;">
+      <a class="cta-btn" href="https://baseballsavant.mlb.com/" target="_blank">
+        View Full Dashboard →
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Data sourced from <a href="https://reddit.com/r/fantasybaseball">Reddit</a> and <a href="https://baseballsavant.mlb.com">Baseball Savant</a></p>
+    <p>Sent automatically on Wednesday &amp; Sunday at 7:00 PM</p>
+    <p style="margin-top:8px; color:#1e2d4d;">
+      To stop receiving these emails, simply disable the scheduler.
+    </p>
+  </div>
+
+</div>
+</body>
+</html>
