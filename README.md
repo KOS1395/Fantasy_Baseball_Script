@@ -1,6 +1,10 @@
-# ⚾ MLB Baseball Savant — Trending Players Email App
+# ⚾ MLB Reddit Hype & Statcast Emailer
 
-Automatically scrapes the **Trending Players** section from [Baseball Savant](https://baseballsavant.mlb.com/) and emails you a styled digest every **Wednesday and Sunday at 12:00 PM**.
+Automatically scans **r/fantasybaseball** for the most hyped players on the waiver wire and emails you a styled digest every **Wednesday and Sunday at 12:00 PM**.
+
+This script connects to the MLB Stats API to fetch all active players, filters out anyone currently rostered in your ESPN Fantasy Baseball league, and then uses a **Regex Fuzzy-Matching Engine** to count how many times available players are mentioned on Reddit (even catching spelling mistakes or using nicknames like "CES" and "Ohtani").
+
+Finally, it cross-references the top 15 hyped players with **Baseball Savant's Trending Data**, attaching Statcast trend arrows to anyone visibly heating up (or cooling down) under the hood.
 
 ---
 
@@ -67,7 +71,7 @@ python main.py
 ```bash
 python main.py --dry-run
 ```
-This prints the full HTML to your terminal so you can inspect it.
+This prints the full HTML to a `preview.html` file so you can open it directly in your browser without filling up your inbox!
 
 ### Start the automatic scheduler (Wed & Sun at 7 PM)
 
@@ -83,30 +87,19 @@ Keep this running in the background (or set it up as a Windows Scheduled Task / 
 
 | File | Purpose |
 |---|---|
-| `main.py` | Entry point — CLI with `--dry-run` and `--schedule` flags |
-| `scraper.py` | Fetches and processes trending players directly from the Baseball Savant API |
-| `espn.py` | Connects to ESPN to fetch rostered players to filter waivers |
+| `main.py` | Entry point — orchestrates APIs, filtering, and email delivery |
+| `reddit.py` | Searches the last 4 days of "Anything Goes" threads on Reddit and counts mentions |
+| `aliases.py` | Handles custom nicknames ("J-Rod", "Elly") and blocks common last names |
+| `mlb_stats.py` | Fetches the master roster of all active MLB players |
+| `scraper.py` | Fetches trending players directly from the Baseball Savant API for context symbols |
+| `espn.py` | Connects to ESPN to fetch rostered players |
 | `emailer.py` | HTML email builder + SMTP sender |
 | `scheduler.py` | APScheduler cron trigger (Wed & Sun 7 PM) |
 | `config.py` | Loads settings from `.env` |
-| `.env` | Your private credentials (do **not** commit this) |
-| `.env.example` | Template for `.env` |
-
----
-
-## 🔧 Customization
-
-| Setting | `.env` key | Default |
-|---|---|---|
-| Schedule days | `SCHEDULE_DAYS` | `wed,sun` |
-| Schedule time | `SCHEDULE_HOUR` / `SCHEDULE_MINUTE` | `19` / `0` |
-| SMTP provider | `SMTP_HOST` / `SMTP_PORT` | Gmail / 587 |
-| Multiple recipients | `EMAIL_TO` | comma-separated |
 
 ---
 
 ## ⚠️ Notes
 
-- **ESPN Filtering**: The script matches players by name. It normalizes names (removing accents, "Jr.", "II", punctuation) to ensure Baseball Savant names match ESPN rosters accurately.
-- **Off-season**: Baseball Savant may show no trending players during the off-season. The app handles this gracefully and logs a warning.
-- **Performance**: The scraper uses Baseball Savant's direct JSON API, which processes lightning-fast (usually under a second).
+- **Smart Scraping**: The script uses `regex` fuzzy string matching. It tolerates up to 1 typo for any player alias longer than 5 letters (e.g. matching "Otani" to "Ohtani") without bleeding into unintended words.
+- **Off-season Statcast**: Baseball Savant may have little to no trending players during the off-season. If a player is hyped on Reddit but has no Statcast arrow next to their name, it just means they aren't currently shifting metrics on Baseball Savant.
