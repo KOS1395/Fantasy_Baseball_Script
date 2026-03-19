@@ -90,5 +90,6 @@ def scrape_trending_players(timeout_s: int = 10) -> list[dict[str, Any]]:
             "position": pos,
         })
 
-    logger.info("Found %d trending players.", len(players))
+    players = [p for p in players if p["trend_dir"] == "up"]
+    logger.info("Found %d trending players (up only).", len(players))
     return players
