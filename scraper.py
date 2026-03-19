@@ -87,10 +87,6 @@ def scrape_trending_players(
         trend_raw = entry.get("trend", "")
         trend_dir, trend_pct = _parse_trend(trend_raw)
 
-        # Skip players trending down
-        if trend_dir != "up":
-            continue
-
         # Check ownership
         norm_name = normalize_name(name)
         if norm_name in owned_players:
