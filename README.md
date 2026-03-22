@@ -73,7 +73,7 @@ python main.py --dry-run
 ```
 This prints the full HTML to a `preview.html` file so you can open it directly in your browser without filling up your inbox!
 
-### Start the automatic scheduler (Wed & Sun at 7 PM)
+### Start the automatic scheduler (Wed & Sun at 12 PM)
 
 ```bash
 python main.py --schedule
