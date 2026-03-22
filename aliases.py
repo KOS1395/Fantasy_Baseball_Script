@@ -16,14 +16,15 @@ COMMON_LAST_NAMES = {
     "James", "Watson", "Brooks", "Kelly", "Sanders", "Price", "Bennett", "Wood", "Barnes", "Ross",
     "Henderson", "Coleman", "Jenkins", "Perry", "Powell", "Long", "Patterson", "Hughes", "Flores",
     "Washington", "Butler", "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin",
-    "Diaz", "Hayes", "Cruz", "Gomez", "Tucker", "Sale", "May", "Story", "Lowe", "Ray", "France", "Pena"
+    "Diaz", "Hayes", "Cruz", "Gomez", "Tucker", "Sale", "May", "Story", "Lowe", "Ray", "France", "Pena", "Soto", 
+    "García", "Sánchez", "Ramírez", "Ryan"
 }
 
 # Mapping of Full Player Name to a list of allowed aliases/nicknames.
 # This ensures we catch slang like "CES" or "J-Rod".
 PLAYER_ALIASES = {
     "Christian Encarnacion-Strand": ["CES", "Encarnacion-Strand"],
-    "Julio Rodriguez": ["J-Rod", "JRod", "Julio"],
+    "Julio Rodriguez": ["J-Rod", "JRod", "Julio", "JuRod"],
     "Shohei Ohtani": ["Shohei"],
     "Vladimir Guerrero Jr.": ["Vlad", "Vladdy"],
     "Ronald Acuna Jr.": ["Acuna"],
@@ -40,8 +41,8 @@ PLAYER_ALIASES = {
     "Gunnar Henderson": ["Gunnar"],
     "Adley Rutschman": ["Adley"],
     "Mookie Betts": ["Mookie"],
-    "Yordan Alvarez": ["Yordan"],
-    "Bo Bichette": ["Bo"],
+    "Yordan Alvarez": ["Yordan", "Yordong"],
+    "Bo Bichette": ["Bo", "Bobo"],
     "Ozzie Albies": ["Ozzie"],
     "Jose Ramirez": ["JoRam", "J-Ram"],
     "Luis Robert Jr.": ["LuBob", "Luis Robert"],
