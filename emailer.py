@@ -282,9 +282,15 @@ _EMAIL_TEMPLATE = """
             <p class="stat-label">{{ player.stat_label }}</p>
           </div>
           <div class="card-trend">
-            <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
-              💬 {{ player.hype_score }} Mentions
-            </div>
+            {% if player.reddit_search_url %}
+            <a href="{{ player.reddit_search_url }}" target="_blank" style="text-decoration: none;">
+            {% endif %}
+              <div class="hype-badge" style="margin-left:0; margin-bottom: 6px;">
+                💬 {{ player.hype_score }} Mentions
+              </div>
+            {% if player.reddit_search_url %}
+            </a>
+            {% endif %}
             
             {% if player.trend_dir %}
               <br/>
@@ -354,6 +360,8 @@ def send_email(players: list[dict[str, Any]], dry_run: bool = False) -> None:
     for i, p in enumerate(players, 1):
         arrow = f"({p['trend_dir']} {p['trend_pct']})" if p.get("trend_dir") else ""
         hype = f"[💬 {p['hype_score']} Mentions]"
+        if p.get("reddit_search_url"):
+            hype += f" -> {p['reddit_search_url']}"
         plain_lines.append(f"#{i}  {p['name']}  {hype} {arrow} |  {p['stat_label']}")
         plain_lines.append(f"    {p['profile_url']}")
     plain_lines += ["", "View full dashboard: https://baseballsavant.mlb.com/"]

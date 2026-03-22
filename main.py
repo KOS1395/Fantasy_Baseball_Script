@@ -79,10 +79,20 @@ def main() -> None:
 
     # 5. Filter to players with hype and sort
     hyped_players = []
+    import urllib.parse
     for p in available_players:
         score = hype_scores.get(p["name"], 0)
         if score > 0:
             p["hype_score"] = score
+            
+            parts = p["name"].split()
+            last_name = parts[-1].strip(".,'")
+            if len(parts) >= 3 and last_name.lower() in {"jr", "jr.", "sr", "sr.", "ii", "iii"}:
+                last_name = parts[-2].strip(".,'")
+                
+            query = urllib.parse.quote(last_name)
+            p["reddit_search_url"] = f"https://www.reddit.com/r/fantasybaseball/search/?q={query}&restrict_sr=1&sort=new"
+            
             hyped_players.append(p)
 
     hyped_players.sort(key=lambda x: x["hype_score"], reverse=True)

@@ -23,7 +23,7 @@ COMMON_LAST_NAMES = {
     "Sanders", "Santana", "Scott", "Seymour", "Simmons", "Smith", "Soriano", "Sosa", "Soto", "Stephenson",
     "Stewart", "Story", "Suarez", "Suárez", "Sánchez", "Taylor", "Thomas", "Thompson", "Torres", "Tucker",
     "Turner", "Vargas", "Varland", "Walker", "Ward", "Washington", "Watson", "Webb", "Wells", "White",
-    "Williams", "Williamson", "Wilson", "Winn", "Wood", "Wright", "Young", "Álvarez"
+    "Williams", "Williamson", "Wilson", "Winn", "Wood", "Wright", "Young", "Álvarez", "Spring", "Springs"
 }
 
 # Mapping of Full Player Name to a list of allowed aliases/nicknames.
