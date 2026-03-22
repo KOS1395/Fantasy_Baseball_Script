@@ -18,7 +18,7 @@ COMMON_LAST_NAMES = {
     "Washington", "Butler", "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin",
     "Diaz", "Hayes", "Cruz", "Gomez", "Tucker", "Sale", "May", "Story", "Lowe", "Ray", "France", "Pena", "Soto", 
     "García", "Sánchez", "Ramírez", "Ryan", "López", "Pérez", "Hernández", "González", "Díaz", "Martínez", 
-    "Rodríguez", "Peña", "Gómez"
+    "Rodríguez", "Peña", "Gómez", "Marte", "Álvarez"
 }
 
 # Mapping of Full Player Name to a list of allowed aliases/nicknames.
