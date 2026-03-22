@@ -6,19 +6,24 @@ aliases.py — Defines custom nicknames, slang, and rules for matching player na
 # This prevents "Will Smith" from getting a point every time someone says "Smith just struck out".
 # They must be referred to by their full name or a specific custom alias.
 COMMON_LAST_NAMES = {
-    "Smith", "Jones", "Williams", "Brown", "Davis", "Miller", "Wilson", "Moore", "Taylor", "Anderson",
-    "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson", "Garcia", "Martinez", "Robinson", "Clark",
-    "Rodriguez", "Lewis", "Lee", "Walker", "Hall", "Allen", "Young", "Hernandez", "King", "Wright",
-    "Lopez", "Hill", "Scott", "Green", "Adams", "Baker", "Gonzalez", "Nelson", "Carter", "Mitchell",
-    "Perez", "Roberts", "Turner", "Phillips", "Campbell", "Parker", "Evans", "Edwards", "Collins",
-    "Stewart", "Sanchez", "Morris", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy", "Bailey",
-    "Rivera", "Cooper", "Richardson", "Cox", "Howard", "Ward", "Torres", "Peterson", "Gray", "Ramirez",
-    "James", "Watson", "Brooks", "Kelly", "Sanders", "Price", "Bennett", "Wood", "Barnes", "Ross",
-    "Henderson", "Coleman", "Jenkins", "Perry", "Powell", "Long", "Patterson", "Hughes", "Flores",
-    "Washington", "Butler", "Simmons", "Foster", "Gonzales", "Bryant", "Alexander", "Russell", "Griffin",
-    "Diaz", "Hayes", "Cruz", "Gomez", "Tucker", "Sale", "May", "Story", "Lowe", "Ray", "France", "Pena", "Soto", 
-    "García", "Sánchez", "Ramírez", "Ryan", "López", "Pérez", "Hernández", "González", "Díaz", "Martínez", 
-    "Rodríguez", "Peña", "Gómez", "Marte", "Álvarez", "Suárez", "Johnson", "Holmes",  "Suarez", "Alvarez", "Ashcraft"
+    "Abreu", "Acuña", "Adams", "Alexander", "Allen", "Alvarado", "Alvarez", "Anderson", "Ashcraft", "Bailey",
+    "Baker", "Baldwin", "Barnes", "Beck", "Bell", "Bennett", "Berroa", "Brooks", "Brown", "Bryant",
+    "Burke", "Butler", "Campbell", "Carter", "Castillo", "Chapman", "Clark", "Clarke", "Cole", "Coleman",
+    "Collins", "Contreras", "Cook", "Cooper", "Cox", "Crawford", "Cruz", "Davis", "Diaz", "Duran",
+    "Díaz", "Edwards", "Estrada", "Evans", "Festa", "Flores", "Foster", "France", "Freeland", "Freeman",
+    "Garcia", "García", "Gilbert", "Gomez", "Gonzales", "Gonzalez", "González", "Gray", "Green", "Greene",
+    "Griffin", "Gómez", "Hall", "Harris", "Hayes", "Henderson", "Hernandez", "Hernández", "Hicks", "Hill",
+    "Holmes", "Howard", "Hughes", "Jackson", "James", "Jansen", "Jenkins", "Johnson", "Jones", "Jung",
+    "Keller", "Kelly", "Kim", "King", "Lee", "Leiter", "Lewis", "Long", "Lopez", "Lowe",
+    "López", "Marte", "Martin", "Martinez", "Martínez", "May", "Miller", "Mitchell", "Montgomery", "Moore",
+    "Morgan", "Morris", "Muncy", "Murphy", "Muñoz", "Myers", "Naylor", "Nelson", "Ortiz", "Parker",
+    "Patterson", "Pena", "Peralta", "Perez", "Perry", "Peterson", "Peña", "Phillips", "Powell", "Price",
+    "Pérez", "Raley", "Ramirez", "Ramos", "Ramírez", "Ray", "Reed", "Richardson", "Rivera", "Roberts",
+    "Robinson", "Rodriguez", "Rodríguez", "Rogers", "Ross", "Ruiz", "Russell", "Ryan", "Sale", "Sanchez",
+    "Sanders", "Santana", "Scott", "Seymour", "Simmons", "Smith", "Soriano", "Sosa", "Soto", "Stephenson",
+    "Stewart", "Story", "Suarez", "Suárez", "Sánchez", "Taylor", "Thomas", "Thompson", "Torres", "Tucker",
+    "Turner", "Vargas", "Varland", "Walker", "Ward", "Washington", "Watson", "Webb", "Wells", "White",
+    "Williams", "Williamson", "Wilson", "Winn", "Wood", "Wright", "Young", "Álvarez"
 }
 
 # Mapping of Full Player Name to a list of allowed aliases/nicknames.

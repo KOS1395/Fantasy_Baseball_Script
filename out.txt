@@ -1,0 +1,12 @@
+COMMON_LAST_NAMES = {
+    "Abreu", "Acuña", "Alexander", "Allen", "Alvarado", "Alvarez", "Anderson", "Ashcraft", "Baldwin", "Beck",
+    "Berroa", "Brown", "Burke", "Castillo", "Chapman", "Clarke", "Cole", "Contreras", "Crawford", "Cruz",
+    "Duran", "Díaz", "Estrada", "Festa", "Freeland", "Freeman", "Garcia", "García", "Gilbert", "Gray",
+    "Greene", "Harris", "Hernández", "Hicks", "Hill", "Holmes", "Jackson", "Jansen", "Johnson", "Jung",
+    "Keller", "Kelly", "Kim", "King", "Lee", "Leiter", "Lopez", "Lowe", "Marte", "Martin",
+    "Miller", "Montgomery", "Muncy", "Murphy", "Muñoz", "Myers", "Naylor", "Ortiz", "Peralta", "Phillips",
+    "Pérez", "Raley", "Ramos", "Ramírez", "Rodriguez", "Rogers", "Ruiz", "Santana", "Scott", "Seymour",
+    "Smith", "Soriano", "Sosa", "Soto", "Stephenson", "Stewart", "Suarez", "Sánchez", "Taylor", "Thomas",
+    "Thompson", "Vargas", "Varland", "Walker", "Webb", "Wells", "Williams", "Williamson", "Wilson", "Winn",
+    "Young"
+}
